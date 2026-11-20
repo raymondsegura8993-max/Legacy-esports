@@ -46,8 +46,8 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
    <button class="choice" type="button" id="statusChoice"><strong>Check Application Status</strong><span>Already applied? Use your private tracking code to see the latest decision.</span></button>
   </div></div>
   <div id="statusView" style="display:none">
-   <p style="color:var(--muted)">Enter the private 64-character tracking code shown after your application was submitted.</p>
-   <div class="field"><label for="applicationCode">Application tracking code</label><input id="applicationCode" type="text" maxlength="64" autocomplete="off" autocapitalize="characters" placeholder="Paste your tracking code"></div>
+   <p style="color:var(--muted)">Enter the private 6-character tracking code shown after your application was submitted.</p>
+   <div class="field"><label for="applicationCode">Application tracking code</label><input id="applicationCode" type="text" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="Enter your 6-character code"></div>
    <button class="btn submit-btn" type="button" id="checkStatusBtn">CHECK STATUS</button>
    <div id="statusResult" class="form-status" role="status" aria-live="polite"></div>
    <button class="choice" type="button" id="backFromStatus" style="width:100%;text-align:center;margin-top:10px">← Back</button>
@@ -99,7 +99,7 @@ form.addEventListener('submit',async e=>{
 });
 document.getElementById('checkStatusBtn').addEventListener('click',async()=>{
  const code=document.getElementById('applicationCode').value.trim().toUpperCase();
- if(!/^[A-F0-9]{64}$/.test(code)){statusResult.textContent='Enter the complete tracking code you received after applying.';statusResult.className='form-status show error';return}
+ if(!/^[A-Z0-9]{6}$/.test(code)){statusResult.textContent='Enter your 6-letter-and-number tracking code.';statusResult.className='form-status show error';return}
  const btn=document.getElementById('checkStatusBtn');btn.disabled=true;btn.textContent='CHECKING...';statusResult.className='form-status';statusResult.textContent='';
  try{
   const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/functions/v1/legacy-status',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'},body:JSON.stringify({application_code:code})});
