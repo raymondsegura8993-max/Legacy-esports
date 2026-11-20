@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Manage Members | Legacy Esports</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090909;color:#f6f3ec;font:16px/1.5 system-ui,Arial}.wrap{width:min(680px,92%);margin:auto}header{padding:18px 0;border-bottom:1px solid #302b20}.brand{color:#f0d58e;font-weight:900;letter-spacing:.12em;text-decoration:none}main{padding:26px 0 60px}h1,h2{color:#f0d58e;margin:8px 0}p{color:#b9b4a8}.panel,.member{background:#151515;border:1px solid #302b20;border-radius:14px;padding:18px;margin:16px 0}label{display:block;color:#f0d58e;font-weight:700;margin:14px 0 5px}input,select{width:100%;padding:13px;border:1px solid #51452d;border-radius:8px;background:#090909;color:#fff;font:inherit}input[type=file]{padding:10px}.btn{border:0;border-radius:8px;background:#d6ad55;color:#15110a;font-weight:800;padding:13px 18px;cursor:pointer;font:inherit}.btn:disabled{opacity:.5}.secondary{background:transparent;border:1px solid #d6ad55;color:#f0d58e}.danger{background:#321919;color:#ffd0d0}.full{width:100%;margin-top:18px}.muted{color:#b9b4a8;font-size:13px}.message{margin-top:12px;color:#f0d58e;overflow-wrap:anywhere}.hidden{display:none!important}.member{display:flex;gap:14px;align-items:center}.member img{width:72px;height:72px;object-fit:cover;border-radius:10px}.member .info{flex:1;min-width:0;overflow-wrap:anywhere}.member strong{color:#f0d58e}.member-actions{display:flex;gap:7px;flex-wrap:wrap}.member-actions button{padding:8px 10px}.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+</style></head><body>
+<header><div class="wrap topline"><a class="brand" href="./">LEGACY ESPORTS</a><a class="btn secondary" href="./admin.html">BACK TO APPLICATIONS</a></div></header>
+<main class="wrap">
+<section id="login" class="panel"><h1>Owner Login</h1><p>Sign in to add and manage your team members.</p>
+<form id="loginForm"><label for="username">Username</label><input id="username" value="raymexicanboy" autocomplete="username" required><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required><button class="btn full" id="loginBtn">LOG IN</button></form><div id="loginMsg" class="message">Only the Legacy owner can manage profiles.</div></section>
+<section id="manager" class="hidden">
+<h1>Team Members</h1><p>Add a member's name, gaming username, and picture. You can change these anytime.</p>
+<form id="memberForm" class="panel">
+<input type="hidden" id="memberId">
+<label for="displayName">Member display name</label><input id="displayName" maxlength="80" placeholder="Example: RayMexicanBoy" required>
+<label for="gameName">Gaming username</label><input id="gameName" maxlength="60" placeholder="Example: raymexicanboy">
+<label for="division">Game / division</label><input id="division" maxlength="60" placeholder="Example: Rainbow Six Siege">
+<label for="role">Team role (optional)</label><input id="role" maxlength="60" placeholder="Player, Coach, Manager...">
+<label for="social">Social media (optional)</label><input id="social" maxlength="180" placeholder="TikTok: @username or profile link">
+<label for="photo">Profile picture</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><div class="muted">JPG, PNG, or WebP. Maximum 5 MB.</div>
+<label for="photoSize">Picture size on website</label><select id="photoSize"><option value="small">Small</option><option value="medium">Medium</option></select>
+<button class="btn full" id="saveBtn" type="submit">ADD MEMBER</button><button class="btn secondary full" id="clearBtn" type="button">CLEAR FORM</button><div id="formMsg" class="message" role="status"></div>
+</form>
+<h2>Current Members</h2><div id="members"><p>Loading members…</p></div>
+</section></main>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+const URL='https://tcdqqqicflmobpzcwdte.supabase.co',KEY='sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n';
+const client=createClient(URL,KEY),$=id=>document.getElementById(id);let rows=[],photoUrl='';
+const say=(id,t)=>$(id).textContent=t;
+function show(on){$('login').classList.toggle('hidden',on);$('manager').classList.toggle('hidden',!on)}
+async function start(){const {data:{session}}=await client.auth.getSession();if(session){if(session.user.email!=='raymexicanboy@legacy.internal'){await client.auth.signOut();return}show(true);await load()}}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;say('loginMsg','Signing in…');try{if($('username').value.trim().toLowerCase()!=='raymexicanboy')throw Error('Enter the Legacy owner username.');const {error}=await client.auth.signInWithPassword({email:'raymexicanboy@legacy.internal',password:$('password').value});if(error)throw error;show(true);await load()}catch(e){say('loginMsg',e.message)}finally{$('loginBtn').disabled=false}});
+async function load(){const {data,error}=await client.from('legacy_members').select('*').order('sort_order').order('created_at');if(error){say('formMsg',error.message);return}rows=data||[];render()}
+function render(){const root=$('members');root.replaceChildren();if(!rows.length){root.textContent='No members added yet.';return}for(const m of rows){const box=document.createElement('div');box.className='member';if(m.image_url){const img=document.createElement('img');img.src=m.image_url;img.alt='';box.append(img)}const info=document.createElement('div');info.className='info';const strong=document.createElement('strong');strong.textContent=m.display_name;const desc=document.createElement('div');desc.className='muted';desc.textContent=[m.gaming_username,m.division,m.team_role].filter(Boolean).join(' · ');info.append(strong,desc);box.append(info);const actions=document.createElement('div');actions.className='member-actions';const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='EDIT';edit.type='button';edit.onclick=()=>fill(m);const del=document.createElement('button');del.className='btn danger';del.textContent='DELETE';del.type='button';del.onclick=()=>remove(m);actions.append(edit,del);box.append(actions);root.append(box)}}
+function fill(m){$('memberId').value=m.id;$('displayName').value=m.display_name||'';$('gameName').value=m.gaming_username||'';$('division').value=m.division||'';$('role').value=m.team_role||'';const s=m.social_links||{};$('social').value=s.Other||'';$('photoSize').value=m.image_size||'small';photoUrl=m.image_url||'';$('photo').value='';say('formMsg',photoUrl?'Current picture is saved. Choose another picture to replace it.':'Editing '+m.display_name);$('saveBtn').textContent='SAVE CHANGES';$('memberForm').scrollIntoView({behavior:'smooth',block:'start'})}
+function clearForm(){$('memberForm').reset();$('memberId').value='';photoUrl='';$('photoSize').value='small';$('saveBtn').textContent='ADD MEMBER';say('formMsg','')}
+$('clearBtn').addEventListener('click',clearForm);
+$('memberForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('saveBtn');btn.disabled=true;btn.textContent='SAVING…';try{const f=$('photo').files[0];if(f){if(f.size>5242880)throw Error('Picture must be 5 MB or smaller.');if(!['image/jpeg','image/png','image/webp'].includes(f.type))throw Error('Please choose a JPG, PNG, or WebP picture.');const path=crypto.randomUUID()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_');const {data,error}=await client.storage.from('legacy-member-photos').upload(path,f,{contentType:f.type});if(error)throw error;photoUrl=client.storage.from('legacy-member-photos').getPublicUrl(data.path).data.publicUrl}
+const payload={display_name:$('displayName').value.trim(),gaming_username:$('gameName').value.trim(),division:$('division').value.trim(),team_role:$('role').value.trim(),image_url:photoUrl,image_size:$('photoSize').value,social_links:{Other:$('social').value.trim()},updated_at:new Date().toISOString()};
+let result=$('memberId').value?await client.from('legacy_members').update(payload).eq('id',$('memberId').value):await client.from('legacy_members').insert(payload);if(result.error)throw result.error;clearForm();await load();say('formMsg','Member saved! It is now on the public website.')}catch(e){say('formMsg',e.message||'Could not save member.')}finally{btn.disabled=false;btn.textContent=$('memberId').value?'SAVE CHANGES':'ADD MEMBER'}});
+async function remove(m){if(!confirm('Remove '+m.display_name+' from the roster?'))return;const {error}=await client.from('legacy_members').delete().eq('id',m.id);if(error){say('formMsg',error.message);return}await load()}
+start();
+</script></body></html>
