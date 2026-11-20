@@ -60,7 +60,7 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
     <label><input type="checkbox" name="games" value="Rainbow Six Siege"> Rainbow Six Siege</label><label><input type="checkbox" name="games" value="Rocket League"> Rocket League</label><label><input type="checkbox" name="games" value="Brawlhalla"> Brawlhalla</label><label><input type="checkbox" name="games" value="Fortnite"> Fortnite</label><label><input type="checkbox" name="games" value="Apex Legends"> Apex Legends</label><label><input type="checkbox" name="games" value="VALORANT"> VALORANT</label><label><input type="checkbox" name="games" value="Marvel Rivals"> Marvel Rivals</label><label><input type="checkbox" name="games" value="Roblox"> Roblox</label><label><input type="checkbox" name="games" value="Other"> Other</label>
    </div></fieldset>
    <div class="field"><label for="otherGames">Other games (optional)</label><input id="otherGames" type="text" maxlength="150" placeholder="List any other games"></div>
-   <div class="field"><label>Social media links (optional)</label><input type="url" id="socialTikTok" placeholder="TikTok link" style="margin-bottom:8px"><input type="url" id="socialYouTube" placeholder="YouTube link" style="margin-bottom:8px"><input type="url" id="socialTwitch" placeholder="Twitch link"></div>
+   <div class="field"><label for="socialMedia">At least one social media link or username *</label><input type="text" id="socialMedia" maxlength="300" required placeholder="Example: @yourname or https://tiktok.com/@yourname"><p class="form-note">You can enter a TikTok, YouTube, Twitch, Instagram, or other social account. A link or username is accepted.</p></div>
    <fieldset class="field" style="border:0;padding:0"><legend>Are you willing to post about Legacy a couple times per month? *</legend><div class="checks"><label><input type="radio" name="willing" value="yes" required> Yes</label><label><input type="radio" name="willing" value="no" required> No</label></div></fieldset>
    <button class="btn submit-btn" type="submit" id="submitLegacy">SUBMIT APPLICATION</button><button class="choice" type="button" id="backChoices" style="width:100%;text-align:center;margin-top:10px">← Back</button>
    <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
@@ -88,7 +88,8 @@ form.addEventListener('submit',async e=>{
  const other=document.getElementById('otherGames').value.trim();if(other)games.push('Other: '+other);
  const willing=form.querySelector('input[name="willing"]:checked');
  if(!platforms.length||!games.length||!willing){showStatus('Please choose at least one platform, one game, and a Yes/No answer.','error');return}
- const payload={gaming_username:document.getElementById('gamingUsername').value.trim(),platform:platforms,games,willing_to_post:willing.value==='yes',social_links:{TikTok:document.getElementById('socialTikTok').value.trim(),YouTube:document.getElementById('socialYouTube').value.trim(),Twitch:document.getElementById('socialTwitch').value.trim()}};
+ const socialMedia=document.getElementById('socialMedia').value.trim();if(!socialMedia){showStatus('Please enter at least one social media link or username.','error');return}
+ const payload={gaming_username:document.getElementById('gamingUsername').value.trim(),platform:platforms,games,willing_to_post:willing.value==='yes',social_links:{'Social media':socialMedia}};
  const btn=document.getElementById('submitLegacy');btn.disabled=true;btn.textContent='SUBMITTING...';
  try{
   const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/functions/v1/legacy-application',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'},body:JSON.stringify(payload)});
