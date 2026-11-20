@@ -43,7 +43,15 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
    <button class="choice" type="button" id="rightHere"><strong>Apply Right Here</strong><span>Complete the application on this website.</span></button>
    <a class="choice" href="https://discord.gg/Q87Xh4dTXd" target="_blank" rel="noopener"><strong>Join Our Discord ↗</strong><span>Join the Legacy community.</span></a>
    <a class="choice" href="https://www.tiktok.com/@raymexicanboy" target="_blank" rel="noopener"><strong>Message Us on TikTok ↗</strong><span>Send the team a message.</span></a>
+   <button class="choice" type="button" id="statusChoice"><strong>Check Application Status</strong><span>Already applied? Use your private tracking code to see the latest decision.</span></button>
   </div></div>
+  <div id="statusView" style="display:none">
+   <p style="color:var(--muted)">Enter the private 64-character tracking code shown after your application was submitted.</p>
+   <div class="field"><label for="applicationCode">Application tracking code</label><input id="applicationCode" type="text" maxlength="64" autocomplete="off" autocapitalize="characters" placeholder="Paste your tracking code"></div>
+   <button class="btn submit-btn" type="button" id="checkStatusBtn">CHECK STATUS</button>
+   <div id="statusResult" class="form-status" role="status" aria-live="polite"></div>
+   <button class="choice" type="button" id="backFromStatus" style="width:100%;text-align:center;margin-top:10px">← Back</button>
+  </div>
   <form id="legacyForm" style="display:none">
    <p class="form-note">Your application is sent privately to Legacy management. Don't include passwords, your home address, or other private information.</p>
    <div class="field"><label for="gamingUsername">Gaming username *</label><input id="gamingUsername" type="text" maxlength="50" required placeholder="Your in-game name"></div>
@@ -61,15 +69,17 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
 </div>
 <script>
 document.getElementById('year').textContent=new Date().getFullYear();
-const modal=document.getElementById('applyModal'),choices=document.getElementById('choiceView'),form=document.getElementById('legacyForm'),statusBox=document.getElementById('formStatus');
-function openApply(){modal.classList.add('open');choices.style.display='block';form.style.display='none'}
+const modal=document.getElementById('applyModal'),choices=document.getElementById('choiceView'),form=document.getElementById('legacyForm'),statusBox=document.getElementById('formStatus'),statusView=document.getElementById('statusView'),statusResult=document.getElementById('statusResult');
+function openApply(){modal.classList.add('open');choices.style.display='block';form.style.display='none';statusView.style.display='none'}
 function closeApply(){modal.classList.remove('open')}
 document.getElementById('openApply').addEventListener('click',openApply);
 document.querySelectorAll('a[href="#join"]').forEach(a=>a.addEventListener('click',e=>{if(a.textContent.toLowerCase().includes('apply')){e.preventDefault();openApply()}}));
 document.getElementById('closeApply').addEventListener('click',closeApply);
 modal.addEventListener('click',e=>{if(e.target===modal)closeApply()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeApply()});
-document.getElementById('rightHere').addEventListener('click',()=>{choices.style.display='none';form.style.display='block'});
+document.getElementById('rightHere').addEventListener('click',()=>{choices.style.display='none';statusView.style.display='none';form.style.display='block'});
+document.getElementById('statusChoice').addEventListener('click',()=>{choices.style.display='none';form.style.display='none';statusView.style.display='block';statusResult.className='form-status';statusResult.textContent=''});
+document.getElementById('backFromStatus').addEventListener('click',()=>{statusView.style.display='none';choices.style.display='block'});
 document.getElementById('backChoices').addEventListener('click',()=>{form.style.display='none';choices.style.display='block';statusBox.className='form-status';statusBox.textContent=''});
 form.addEventListener('submit',async e=>{
  e.preventDefault();
@@ -83,8 +93,22 @@ form.addEventListener('submit',async e=>{
  try{
   const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/functions/v1/legacy-application',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'},body:JSON.stringify(payload)});
   const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||'Submission failed');
-  showStatus('Application submitted! Legacy management will review it.','success');form.reset();btn.textContent='SUBMITTED';
+  showStatus('Application submitted! Save this tracking code somewhere safe: '+result.application_code+'. Return to this website, choose Check Application Status, and enter the code to see whether you are pending, accepted, or rejected. Do not share this code with anyone.','success');form.reset();btn.textContent='SUBMITTED';
  }catch(err){showStatus(err.message||'Could not submit. Please try again.','error');btn.disabled=false;btn.textContent='SUBMIT APPLICATION'}
+});
+document.getElementById('checkStatusBtn').addEventListener('click',async()=>{
+ const code=document.getElementById('applicationCode').value.trim().toUpperCase();
+ if(!/^[A-F0-9]{64}$/.test(code)){statusResult.textContent='Enter the complete tracking code you received after applying.';statusResult.className='form-status show error';return}
+ const btn=document.getElementById('checkStatusBtn');btn.disabled=true;btn.textContent='CHECKING...';statusResult.className='form-status';statusResult.textContent='';
+ try{
+  const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/functions/v1/legacy-status',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'},body:JSON.stringify({application_code:code})});
+  const result=await response.json();if(!response.ok||!result.ok)throw new Error(result.error||'Could not check status.');
+  const labels={pending:'Your application is still pending. Legacy management has not made a decision yet.',accepted:'Congratulations! Your application has been accepted. Join the Legacy Discord to connect with the team: https://discord.gg/Q87Xh4dTXd',rejected:'Your application was not accepted at this time.'};
+  const state=result.application.status;
+  if(!labels[state])throw new Error('The application returned an unknown status.');
+  statusResult.textContent=labels[state];statusResult.className='form-status show '+(state==='accepted'?'success':state==='rejected'?'error':'success');
+ }catch(err){statusResult.textContent=err.message||'Could not check status. Please try again.';statusResult.className='form-status show error'}
+ finally{btn.disabled=false;btn.textContent='CHECK STATUS'}
 });
 function showStatus(message,type){statusBox.textContent=message;statusBox.className='form-status show '+type}
 </script>
