@@ -28,10 +28,59 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
 .content-meta{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:.08em}
 .content-empty{color:var(--muted);text-align:center;padding:22px;border:1px dashed var(--line);border-radius:12px}
 .content-link{color:var(--gold2);font-weight:800;overflow-wrap:anywhere}
+
+/* Professional layout refinement */
+:root{--bg:#08090b;--panel:#111318;--gold:#c9a34a;--gold2:#f0d58e;--text:#f7f5ef;--muted:#aaa9a4;--line:#292a2e}
+body{background:var(--bg);letter-spacing:.005em}
+.wrap{width:min(1180px,92%)}
+header{background:rgba(8,9,11,.94);border-bottom:1px solid rgba(201,163,74,.2)}
+.nav{min-height:76px;height:auto;padding:10px 0}
+.brand{font-size:18px;letter-spacing:.16em;white-space:nowrap}
+.brand small{font-size:9px;margin-top:2px}
+nav{gap:clamp(12px,2vw,25px)}
+nav a{font-size:13px;font-weight:650;letter-spacing:.025em;white-space:nowrap;transition:color .18s}
+nav a:hover,nav a:focus-visible{color:var(--gold2)}
+.btn{min-height:44px;padding:11px 19px;border-radius:6px;font-size:12px;letter-spacing:.07em;box-shadow:0 5px 18px #0003}
+.btn.outline{border-color:#77602f}
+.hero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(88px,11vw,138px) 0 clamp(76px,9vw,108px);background:radial-gradient(ellipse at 50% 0%,#8b68252b,transparent 54%),linear-gradient(145deg,#141519 0%,#0b0c0f 58%,#08090b 100%);border-bottom:1px solid rgba(201,163,74,.22)}
+.hero:before,.hero:after{content:"";position:absolute;z-index:-1;pointer-events:none;border:1px solid #c9a34a18;transform:rotate(35deg)}
+.hero:before{width:360px;height:520px;left:-230px;top:-120px}
+.hero:after{width:420px;height:600px;right:-270px;bottom:-260px}
+.eyebrow{font-size:11px;letter-spacing:.3em}
+.hero h1{font-size:clamp(44px,7vw,78px);font-weight:900;letter-spacing:.045em;margin:20px 0 16px}
+.hero p{font-size:clamp(15px,2vw,18px);line-height:1.75;color:#c1beb5}
+.actions{gap:14px}
+section{padding:clamp(58px,7vw,88px) 0;scroll-margin-top:88px}
+section:nth-of-type(odd){background:linear-gradient(180deg,#0b0c0f 0%,#090a0c 100%)}
+.section-head{max-width:720px;margin:0 auto 38px}
+.section-head h2{font-size:clamp(25px,3.5vw,36px);letter-spacing:.025em}
+.section-head p{font-size:14px;line-height:1.75}
+.grid,.content-grid{gap:18px}
+.card,.content-card{background:linear-gradient(145deg,#15171c,#101115);border:1px solid #2b2c31;border-radius:10px;padding:24px;box-shadow:0 12px 30px #0002;transition:border-color .2s,transform .2s}
+.card:hover,.content-card:hover{border-color:#79602f;transform:translateY(-2px)}
+.card h3,.content-card h3{font-size:16px;letter-spacing:.015em}
+.card p,.content-card p{line-height:1.7}
+.game{min-height:88px}
+.game .symbol{border:1px solid #5c4928;background:#211b10;border-radius:8px}
+.roster-game>h3{font-size:18px;letter-spacing:.04em;text-transform:uppercase}
+.member-card{background:linear-gradient(145deg,#15171c,#101115);border:1px solid #2b2c31;border-radius:10px;padding:18px;transition:border-color .2s,transform .2s}
+.member-card:hover{border-color:#79602f;transform:translateY(-2px)}
+.member-photo{border-color:#9c7a37;border-radius:9px}
+.content-meta{font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.content-link{display:inline-block;margin-top:10px;font-size:12px;letter-spacing:.06em}
+.rules{gap:14px}
+.rule{background:#111318;border-color:#292a2e;border-radius:8px;padding:17px;line-height:1.65}
+.cta{background:radial-gradient(ellipse at 50% 0%,#8b68252b,transparent 70%),linear-gradient(135deg,#191710,#101115);border-color:#665027;border-radius:12px;padding:clamp(28px,5vw,48px)}
+footer{background:#08090b;border-top:1px solid #292a2e;padding:30px 0}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+@media(max-width:900px){.nav{gap:14px}nav{gap:13px}nav a{font-size:12px}.nav>.btn{padding:10px 12px;font-size:10px}}
+@media(max-width:760px){.nav{align-items:center;flex-wrap:wrap;gap:8px 14px;padding:12px 0}.nav nav{order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:7px 0 3px;scrollbar-width:thin}.nav nav a{display:block!important;font-size:12px;padding:4px 2px}.nav>.btn{display:inline-flex;margin-left:auto}.hero{padding:72px 0 64px}.member-roster{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.wrap{width:min(100% - 30px,1180px)}.nav{gap:7px 10px}.brand{font-size:16px}.nav>.btn{min-height:38px;padding:8px 10px;font-size:9px}.nav nav{gap:19px}.grid,.rules{grid-template-columns:1fr}.member-roster{grid-template-columns:1fr}.card,.content-card{padding:20px}.hero h1{font-size:clamp(40px,12vw,58px)}section{padding:54px 0}.section-head{margin-bottom:28px}.cta{padding:28px 18px}}
+
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="#">LEGACY <small>ESPORTS · LGY</small></a><nav><a href="#divisions">Games</a><a href="#members">Members</a><a href="#divRoster">Rosters</a><a href="#news">News</a><a href="#schedule">Matches</a><a href="#join">Join</a><a href="#standards">Standards</a></nav><a class="btn" href="#join">APPLY TO JOIN</a></div></header>
+<header><div class="wrap nav"><a class="brand" href="#" aria-label="Legacy Esports home">LEGACY <small>ESPORTS · LGY</small></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="#divisions">Divisions</a><a href="#members">Team</a><a href="#news">News</a><a href="#schedule">Matches</a><a href="#join">Join</a></nav><a class="btn" href="#join">APPLY NOW</a></div></header>
 <main>
 <section class="hero"><div class="wrap"><div class="eyebrow">LEGACY ESPORTS · LGY</div><h1>BUILD YOUR <span>LEGACY.</span></h1><p>A growing gaming organization for competitive players and creators. Bring your teamwork, creativity, and drive.</p><div class="actions"><a class="btn" href="#join">JOIN LEGACY</a><a class="btn outline" href="#divisions">EXPLORE OUR GAMES</a></div><p style="margin-top:26px;font-size:12px;letter-spacing:.28em;color:var(--gold)">BORN TO COMPETE.</p></div></section>
 <section id="about"><div class="wrap"><div class="section-head"><h2>ONE TEAM. <span class="gold">MANY GAMES.</span></h2><p>Our goal is to build a respectful community where players and creators can improve together.</p></div><div class="grid"><article class="card"><h3>Compete</h3><p>Connect with teammates, practice, and look for tournament opportunities as divisions develop.</p></article><article class="card"><h3>Create</h3><p>Gaming YouTubers, streamers, editors, and short-form creators are welcome to apply.</p></article><article class="card"><h3>Grow together</h3><p>Support fellow members, share highlights, and help make the LGY community stronger.</p></article></div></div></section>
