@@ -7,6 +7,15 @@
 <meta name="description" content="Legacy Esports member profiles.">
 <title>Legacy Esports | Members</title>
 <style>
+.owner-login{position:absolute;right:3%;top:50%;transform:translateY(-50%);border:1px solid #80652f;background:#17130b;color:var(--gold2);border-radius:7px;padding:9px 13px;font:800 10px system-ui;letter-spacing:.12em;cursor:pointer}
+.owner-login:hover{background:#2a2112;border-color:var(--gold)}
+.dashboard-overlay{position:fixed;inset:0;z-index:1000;background:#000d;display:none;align-items:center;justify-content:center;padding:3vh 3vw}
+.dashboard-overlay.open{display:flex}
+.dashboard-window{width:min(1100px,100%);height:94vh;background:#090909;border:1px solid #80652f;border-radius:14px;overflow:hidden;box-shadow:0 24px 90px #000b;display:flex;flex-direction:column}
+.dashboard-bar{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#151515;border-bottom:1px solid #51452d;color:var(--gold2);font-size:11px;font-weight:800;letter-spacing:.12em}
+.dashboard-close{border:1px solid #80652f;background:transparent;color:#f0d58e;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700}
+.dashboard-frame{width:100%;height:100%;border:0;background:#090909}
+@media(max-width:560px){.head{justify-content:center;padding:58px 0 12px}.owner-login{top:10px;right:0;transform:none}.dashboard-overlay{padding:0}.dashboard-window{height:100vh;border-radius:0;border:0}.dashboard-bar{height:46px;flex-basis:46px}}
 :root{color-scheme:dark;--bg:#08090b;--panel:#13151a;--gold:#c9a34a;--gold2:#f0d58e;--muted:#aaa9a4;--line:#292a2e}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#8b68251b,transparent 48%),var(--bg);color:#f7f5ef;font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 header{border-bottom:1px solid #c9a34a35;background:#090a0ceF}.head{width:min(1180px,94%);margin:auto;min-height:82px;display:flex;align-items:center;justify-content:center}.brand{text-align:center;color:var(--gold2);font-size:19px;font-weight:900;letter-spacing:.18em}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.32em}
@@ -27,7 +36,13 @@ footer{text-align:center;border-top:1px solid var(--line);padding:22px;color:#77
 </style>
 </head>
 <body>
-<header><div class="head"><div class="brand">LEGACY ESPORTS<small>BORN TO COMPETE.</small></div></div></header>
+<header><div class="head"><div class="brand">LEGACY ESPORTS<small>BORN TO COMPETE.</small></div><button class="owner-login" id="openDashboard" type="button">OWNER LOGIN</button></div></header>
+<div class="dashboard-overlay" id="dashboardOverlay" aria-hidden="true">
+ <section class="dashboard-window" role="dialog" aria-modal="true" aria-label="Legacy Esports owner dashboard">
+  <div class="dashboard-bar"><span>LEGACY ESPORTS · OWNER DASHBOARD</span><button class="dashboard-close" id="closeDashboard" type="button">CLOSE ✕</button></div>
+  <iframe class="dashboard-frame" src="./members.html" title="Owner dashboard"></iframe>
+ </section>
+</div>
 <main>
 <div class="intro"><div class="eyebrow">THE ROSTER</div><h1>OUR MEMBERS</h1><p>Meet the players and people representing Legacy Esports.</p></div>
 <div class="gallery" id="gallery"><div class="empty">Loading member profiles…</div></div>
@@ -58,6 +73,12 @@ async function loadMembers(){
  }catch(error){gallery.replaceChildren();addText(gallery,'div','error','Member profiles are temporarily unavailable. Please try again later.')}
 }
 loadMembers();
+const dashboardOverlay=document.getElementById('dashboardOverlay');
+document.getElementById('openDashboard').addEventListener('click',()=>{dashboardOverlay.classList.add('open');dashboardOverlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'});
+function closeDashboard(){dashboardOverlay.classList.remove('open');dashboardOverlay.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+document.getElementById('closeDashboard').addEventListener('click',closeDashboard);
+dashboardOverlay.addEventListener('click',event=>{if(event.target===dashboardOverlay)closeDashboard()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&dashboardOverlay.classList.contains('open'))closeDashboard()});
 </script>
 </body>
 </html>
