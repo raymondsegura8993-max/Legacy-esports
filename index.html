@@ -2,54 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08090b">
-<meta name="description" content="Legacy Esports member profile photo gallery.">
+<meta name="description" content="Legacy Esports member profiles.">
 <title>Legacy Esports | Members</title>
 <style>
-:root{color-scheme:dark;--bg:#08090b;--gold:#c9a34a;--line:#292a2e}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-main{width:min(1180px,94%);margin:0 auto;padding:28px 0 48px}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
-.photo{width:100%;aspect-ratio:1;display:block;object-fit:cover;border:1px solid #65502b;border-radius:12px;background:#151515}
-.empty,.error{color:#aaa;text-align:center;padding:32px 12px;grid-column:1/-1;border:1px dashed var(--line);border-radius:12px}
-@media(max-width:520px){main{width:calc(100% - 24px);padding-top:18px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo{border-radius:9px}}
+:root{color-scheme:dark;--bg:#08090b;--panel:#13151a;--gold:#c9a34a;--gold2:#f0d58e;--muted:#aaa9a4;--line:#292a2e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,#8b68251b,transparent 48%),var(--bg);color:#f7f5ef;font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{border-bottom:1px solid #c9a34a35;background:#090a0ceF}.head{width:min(1180px,94%);margin:auto;min-height:82px;display:flex;align-items:center;justify-content:center}.brand{text-align:center;color:var(--gold2);font-size:19px;font-weight:900;letter-spacing:.18em}.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.32em}
+main{width:min(1180px,94%);margin:auto;padding:48px 0 64px}.intro{text-align:center;margin:0 0 32px}.eyebrow{font-size:10px;letter-spacing:.3em;color:var(--gold);font-weight:800}.intro h1{font-size:clamp(30px,5vw,44px);margin:8px 0;color:#f7f5ef;letter-spacing:.04em}.intro p{margin:0;color:var(--muted)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:18px}
+.member{min-width:0;overflow:hidden;background:linear-gradient(145deg,#17191e,#101115);border:1px solid var(--line);border-radius:13px;box-shadow:0 12px 28px #0003;transition:transform .2s,border-color .2s}
+.member:hover{transform:translateY(-3px);border-color:#80652f}
+.photo-wrap{height:210px;background:#0d0e11;display:grid;place-items:center;border-bottom:1px solid #c9a34a35;padding:12px}
+.photo{width:100%;height:100%;object-fit:contain;border-radius:8px}
+.details{padding:17px 18px 19px}.name{margin:0;color:var(--gold2);font-size:19px;overflow-wrap:anywhere}.username{color:#f0eee8;margin:3px 0 13px;overflow-wrap:anywhere;font-size:13px}
+.meta-label{font-size:9px;color:var(--gold);font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.role{color:#e4e0d6;font-size:13px;margin:0 0 13px;overflow-wrap:anywhere}
+.games{display:flex;flex-wrap:wrap;gap:6px}.game{border:1px solid #5a492a;background:#211b10;color:#ead39b;padding:5px 8px;border-radius:5px;font-size:11px}
+.empty,.error{color:var(--muted);text-align:center;padding:34px 14px;grid-column:1/-1;border:1px dashed var(--line);border-radius:12px}
+footer{text-align:center;border-top:1px solid var(--line);padding:22px;color:#777;font-size:11px;letter-spacing:.12em}
+@media(max-width:560px){main{width:calc(100% - 24px);padding:32px 0 44px}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo-wrap{height:155px;padding:8px}.details{padding:12px}.name{font-size:16px}.username{font-size:11px;margin-bottom:10px}.role{font-size:12px}.game{font-size:10px;padding:4px 6px}}
+@media(max-width:360px){.gallery{grid-template-columns:1fr}.photo-wrap{height:220px}}
 </style>
 </head>
 <body>
+<header><div class="head"><div class="brand">LEGACY ESPORTS<small>BORN TO COMPETE.</small></div></div></header>
 <main>
-<div class="gallery" id="gallery" aria-label="Legacy Esports member profile pictures">
-<div class="empty">Loading…</div>
-</div>
+<div class="intro"><div class="eyebrow">THE ROSTER</div><h1>OUR MEMBERS</h1><p>Meet the players and people representing Legacy Esports.</p></div>
+<div class="gallery" id="gallery"><div class="empty">Loading member profiles…</div></div>
 </main>
+<footer>LEGACY ESPORTS · LGY</footer>
 <script>
 const gallery=document.getElementById('gallery');
-async function loadProfilePictures(){
+function addText(parent,tag,className,value){const el=document.createElement(tag);el.className=className;el.textContent=value;parent.append(el);return el}
+async function loadMembers(){
  try{
-  const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/rest/v1/legacy_members?select=image_url,image_size&image_url=not.is.null&order=sort_order.asc,created_at.asc',{headers:{apikey:'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'}});
-  if(!response.ok)throw new Error('Unable to load pictures');
-  const members=await response.json();
-  gallery.replaceChildren();
-  const pictures=members.filter(member=>typeof member.image_url==='string'&&member.image_url.trim());
-  if(!pictures.length){
-   const empty=document.createElement('div');empty.className='empty';empty.textContent='No profile pictures have been added yet.';gallery.append(empty);return;
+  const response=await fetch('https://tcdqqqicflmobpzcwdte.supabase.co/rest/v1/legacy_members?select=display_name,gaming_username,team_role,image_url,image_size,social_links,division&order=sort_order.asc,created_at.asc',{headers:{apikey:'sb_publishable_cwjt8qobOKwQKYDLXZ591w_vUv1q7-n'}});
+  if(!response.ok)throw new Error('Unable to load members');
+  const members=await response.json();gallery.replaceChildren();
+  if(!members.length){addText(gallery,'div','empty','No members have been added yet.');return}
+  for(const member of members){
+   const card=document.createElement('article');card.className='member';
+   if(member.image_url){const wrap=document.createElement('div');wrap.className='photo-wrap';const img=document.createElement('img');img.className='photo';img.src=member.image_url;img.alt=(member.display_name||'Member')+' profile picture';img.loading='lazy';img.decoding='async';wrap.append(img);card.append(wrap)}
+   const details=document.createElement('div');details.className='details';
+   addText(details,'h2','name',member.display_name||'Legacy Member');
+   if(member.gaming_username)addText(details,'p','username',member.gaming_username);
+   if(member.team_role){addText(details,'div','meta-label','TEAM ROLE');addText(details,'p','role',member.team_role)}
+   const socials=member.social_links||{};
+   let games=Array.isArray(socials.Games)?socials.Games.filter(Boolean):[];
+   if(!games.length&&member.division)games=[member.division];
+   if(games.length){addText(details,'div','meta-label','GAMES');const list=document.createElement('div');list.className='games';for(const game of [...new Set(games)])addText(list,'span','game',game);details.append(list)}
+   card.append(details);gallery.append(card);
   }
-  for(const member of pictures){
-   const image=document.createElement('img');
-   image.className='photo';
-   image.src=member.image_url;
-   image.alt='Legacy Esports member profile picture';
-   image.loading='lazy';
-   image.decoding='async';
-   gallery.append(image);
-  }
- }catch(error){
-  gallery.replaceChildren();
-  const message=document.createElement('div');message.className='error';message.textContent='Profile pictures are temporarily unavailable.';gallery.append(message);
- }
+ }catch(error){gallery.replaceChildren();addText(gallery,'div','error','Member profiles are temporarily unavailable. Please try again later.')}
 }
-loadProfilePictures();
+loadMembers();
 </script>
 </body>
 </html>
